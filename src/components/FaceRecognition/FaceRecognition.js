@@ -2,11 +2,20 @@ import React from 'react';
 
 import './FaceRecognition.css';
 
-const FaceRecognition = ({ imageUrl }) => {
+const FaceRecognition = ({ imageUrl, boundingBox }) => {
   return (
     <div className="center ma">
       <div className="absolute mt2">
-        <img src={imageUrl} alt="" />
+        <img id="input-image" src={imageUrl} alt="" />
+        <div
+          className="bounding-box"
+          style={{
+            top: boundingBox.top,
+            bottom: boundingBox.bottom,
+            right: boundingBox.right,
+            left: boundingBox.left
+          }}
+        />
       </div>
     </div>
   );

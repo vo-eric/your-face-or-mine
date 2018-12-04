@@ -31,7 +31,8 @@ class App extends Component {
     super();
     this.state = {
       input: '',
-      imageUrl: ''
+      imageUrl: '',
+      boundingBox: {}
     };
   }
 
@@ -43,11 +44,29 @@ class App extends Component {
     this.setState({ imageUrl: this.state.input });
     app.models
       .predict(Clarifai.FACE_DETECT_MODEL, this.state.input)
-      .then(
-        res =>
-          console.log(res.outputs[0].data.regions[0].region_info.bounding_box),
-        err => console.log(err)
-      );
+      .then(res => this.displayBoundingBox(this.calculateBoxLocation(res)))
+      .catch(err => console.log(err));
+  };
+
+  calculateBoxLocation = data => {
+    const face = data.outputs[0].data.regions[0].region_info.bounding_box,
+      image = document.getElementById('input-image'),
+      width = Number(image.width),
+      height = Number(image.height);
+
+    console.log(data);
+
+    return {
+      left: face.left_col * width,
+      right: width - face.right_col * width,
+      top: face.top_row * height,
+      bottom: height - face.bottom_row * height
+    };
+  };
+
+  displayBoundingBox = boundingBox => {
+    console.log(boundingBox);
+    this.setState({ boundingBox });
   };
 
   render() {
@@ -61,7 +80,10 @@ class App extends Component {
           onInputChange={this.onInputChange}
           onSubmit={this.onSubmit}
         />
-        <FaceRecognition imageUrl={this.state.imageUrl} />
+        <FaceRecognition
+          boundingBox={this.state.boundingBox}
+          imageUrl={this.state.imageUrl}
+        />
       </div>
     );
   }
